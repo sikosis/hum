@@ -1,0 +1,5 @@
+/build/
+/hum
+/tests/terminal_test
+*.o
+*.hpkg
