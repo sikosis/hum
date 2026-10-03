@@ -5,3 +5,4 @@
 *.hpkg
 .DS_Store
 update-git.sh
+website
