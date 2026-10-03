@@ -4,7 +4,7 @@ questions, choosing values, browsing files and displaying progress. It brings a 
 Gum-inspired command set to Haiku shell scripts while keeping standard output \
 safe for pipelines. The program has no third-party runtime dependencies."
 HOMEPAGE="https://github.com/sikosis/hum"
-COPYRIGHT="2026 Hum contributors"
+COPYRIGHT="2026 hum contributors"
 LICENSE="MIT"
 REVISION="1"
 SOURCE_URI="https://github.com/sikosis/hum/archive/refs/tags/v$portVersion.tar.gz"

@@ -1,12 +1,12 @@
 # Command roadmap
 
-Hum is an independent project rather than a source port. Gum's current v2
-command surface is used as a feature checklist, while Hum uses its own name,
+hum is an independent project rather than a source port. Gum's current v2
+command surface is used as a feature checklist, while hum uses its own name,
 documentation, implementation and `HUM_` environment variable namespace.
 
 ## Upstream command inventory
 
-| Command | Purpose | Hum phase |
+| Command | Purpose | hum phase |
 | --- | --- | --- |
 | `style` | Apply colours, attributes, borders and spacing | Phase 1 |
 | `confirm` | Ask a yes/no question using the exit status | Phase 1 |
@@ -49,7 +49,7 @@ restoration after interruption.
 
 ## Phase 2: everyday scripting
 
-Phase 2 is implemented in Hum 0.2. It adds `join`, `log`, `input`, `choose`, and
+Phase 2 is implemented in hum 0.2. It adds `join`, `log`, `input`, `choose`, and
 `spin`. These commands reuse the Phase 1 renderer and terminal layer while
 adding list selection, UTF-8 text entry, subprocess execution and richer key
 decoding.
@@ -69,7 +69,7 @@ The implemented support boundary is:
   error-only output, subprocess status propagation and timeout termination.
 
 Most component-specific style flags, cursor animation modes, general printf verbs
-and upstream environment-variable aliases are not part of 0.2. Hum currently
+and upstream environment-variable aliases are not part of 0.2. hum currently
 uses `HUM_LOG_LEVEL` and `NO_COLOR`; further `HUM_` configuration will be added
 as the interfaces settle.
 
@@ -108,7 +108,7 @@ supported command surface is stable.
 
 ## Compatibility policy
 
-Hum aims for familiar shell semantics, not byte-for-byte Gum compatibility.
-Where compatible behaviour is sensible, Hum will retain familiar command and
-flag names. Differences will be documented, and Hum-specific environment
+hum aims for familiar shell semantics, not byte-for-byte Gum compatibility.
+Where compatible behaviour is sensible, hum will retain familiar command and
+flag names. Differences will be documented, and hum-specific environment
 variables will use `HUM_` rather than `GUM_`.
