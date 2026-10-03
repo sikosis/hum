@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
+#include <unistd.h>
 
 namespace hum {
 namespace {
@@ -94,8 +95,9 @@ int runConfirm(const std::vector<std::string>& args) {
     }
 
     bool choice = options.defaultAffirmative;
+    const bool standardInputIsInteractive = ::isatty(STDIN_FILENO) != 0;
     TerminalSession terminal;
-    if (!terminal.interactive() || !terminal.enableRawMode()) {
+    if (!standardInputIsInteractive || !terminal.interactive() || !terminal.enableRawMode()) {
         std::cerr << options.prompt << " [" << (choice ? "Y/n" : "y/N") << "] ";
         std::string answer;
         std::getline(std::cin, answer);

@@ -4,7 +4,7 @@ Hum brings pleasant, composable terminal prompts and formatting to Haiku.
 It is an independent C++ implementation inspired by Charmbracelet's Gum,
 designed to build without third-party runtime dependencies.
 
-hum 0.31 provides:
+hum 0.32 provides:
 
 - `hum style` for ANSI colours, text attributes, borders, alignment, sizing,
   margins and padding;
