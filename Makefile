@@ -1,5 +1,6 @@
 CXX ?= c++
-CPPFLAGS ?= -Iinclude -DHUM_VERSION=\"0.3.0\"
+VERSION := $(strip $(shell cat VERSION))
+CPPFLAGS ?= -Iinclude -DHUM_VERSION=\"$(VERSION)\"
 CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra -Wpedantic
 LDFLAGS ?=
 
@@ -21,6 +22,8 @@ $(TARGET): $(OBJECTS)
 
 %.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+src/main.o: VERSION
 
 $(TEST_TARGET): tests/terminal_test.cpp src/terminal.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^

@@ -75,7 +75,7 @@ as the interfaces settle.
 
 ## Phase 3: interactive data
 
-Phase 3 is implemented in Hum 0.3. It adds `filter`, `file`, `pager`, `table`,
+Phase 3 is implemented in hum 0.3. It adds `filter`, `file`, `pager`, `table`,
 and `write`, plus a shared live-region viewport and terminal-size detection.
 
 The implemented support boundary is:

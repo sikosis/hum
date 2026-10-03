@@ -16,7 +16,7 @@
 #include <vector>
 
 #ifndef HUM_VERSION
-#define HUM_VERSION "0.1.0-dev"
+#define HUM_VERSION "unknown"
 #endif
 
 namespace {
@@ -25,7 +25,7 @@ void printHelp() {
 //---------------------------------------------------------------------------------------------------------------------------------//
 
     std::cout <<
-        "Hum — pleasant terminal tools for Haiku\n\n"
+        "hum v" << HUM_VERSION << " — pleasant terminal tools for Haiku\n\n"
         "Usage: hum <command> [options]\n\n"
         "Commands:\n"
         "  style      Apply colour, borders and spacing to text\n"
@@ -41,7 +41,7 @@ void printHelp() {
         "  table      Render and select delimited table rows\n"
         "  write      Edit multi-line text\n"
         "  help       Show this help\n"
-        "  version    Print the Hum version\n\n"
+        "  version    Print the hum version\n\n"
         "Run 'hum <command> --help' for command-specific help.\n";
 }
 

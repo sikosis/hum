@@ -1,0 +1,55 @@
+SUMMARY="Pleasant terminal prompts and formatting for shell scripts"
+DESCRIPTION="A collection of composable terminal tools for styling text, asking \
+questions, choosing values, browsing files and displaying progress. It brings a \
+Gum-inspired command set to Haiku shell scripts while keeping standard output \
+safe for pipelines. The program has no third-party runtime dependencies."
+HOMEPAGE="https://github.com/sikosis/hum"
+COPYRIGHT="2026 Hum contributors"
+LICENSE="MIT"
+REVISION="1"
+SOURCE_URI="https://github.com/sikosis/hum/archive/refs/tags/v$portVersion.tar.gz"
+CHECKSUM_SHA256="@CHECKSUM_SHA256@"
+SOURCE_FILENAME="hum-$portVersion.tar.gz"
+
+ARCHITECTURES="?x86_64"
+
+PROVIDES="
+	hum$secondaryArchSuffix = $portVersion
+	cmd:hum = $portVersion
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	"
+
+BUILD_REQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	"
+BUILD_PREREQUIRES="
+	cmd:cmake
+	cmd:g++$secondaryArchSuffix
+	cmd:ninja
+	"
+
+defineDebugInfoPackage hum$secondaryArchSuffix \
+	"$binDir"/hum
+
+BUILD()
+{
+	cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		$cmakeDirArgs \
+		-DCMAKE_INSTALL_BINDIR=$binDir
+	ninja -v -C build $jobArgs
+}
+
+INSTALL()
+{
+	ninja -C build install
+
+	mkdir -p "$docDir"
+	cp README.md docs/COMMANDS.md "$docDir"
+}
+
+TEST()
+{
+	ctest --test-dir build --output-on-failure
+}

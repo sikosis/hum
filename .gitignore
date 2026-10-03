@@ -3,3 +3,5 @@
 /tests/terminal_test
 *.o
 *.hpkg
+.DS_Store
+update-git.sh
