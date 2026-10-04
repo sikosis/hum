@@ -1,5 +1,7 @@
 # hum
 
+> hum ... it makes your Terminal sing.
+
 hum makes shell scripts friendlier with colourful text, interactive prompts,
 pickers, tables, progress indicators and other terminal building blocks made
 for Haiku.

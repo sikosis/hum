@@ -15,7 +15,7 @@ fi
 title=$($HUM style --foreground '#FF74C8' --bold --align center --width 68 \
     'h u m')
 tagline=$($HUM style --foreground '#79E8F2' --italic --align center --width 68 \
-    'terminal tools that feel at home on Haiku')
+    'hum ... it makes your Terminal sing.')
 
 left_panel=$($HUM style --border rounded --border-foreground '#FF74C8' \
     --padding '1 2' --width 29 \
@@ -33,4 +33,3 @@ $HUM style --foreground '#FFE46B' --bold --align center --width 68 \
 printf '\n'
 $HUM style --foreground '#8DE2A1' --align center --width 68 \
     'github.com/sikosis/hum'
-

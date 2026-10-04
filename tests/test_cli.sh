@@ -17,9 +17,11 @@ assert_eq()
     [ "$expected" = "$actual" ] || fail "$description: expected '$expected', got '$actual'"
 }
 
-assert_eq "hum 0.33" "$($HUM --version)" "version output"
-assert_eq "hum v0.33 — pleasant terminal tools for Haiku" \
+assert_eq "hum 0.34" "$($HUM --version)" "version output"
+assert_eq "hum v0.34" \
     "$($HUM --help | sed -n '1p')" "help heading version"
+assert_eq "hum ... it makes your Terminal sing." \
+    "$($HUM --help | sed -n '2p')" "help tagline"
 assert_eq "hello" "$(NO_COLOR=1 $HUM style hello)" "plain style"
 assert_eq "hello
 world" "$(printf 'hello\nworld\n' | NO_COLOR=1 $HUM style)" "stdin style"
