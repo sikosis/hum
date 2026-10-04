@@ -18,10 +18,8 @@ assert_eq()
 }
 
 assert_eq "hum 0.34" "$($HUM --version)" "version output"
-assert_eq "hum v0.34" \
+assert_eq "hum v0.34 ... it makes your Terminal sing." \
     "$($HUM --help | sed -n '1p')" "help heading version"
-assert_eq "hum ... it makes your Terminal sing." \
-    "$($HUM --help | sed -n '2p')" "help tagline"
 assert_eq "hello" "$(NO_COLOR=1 $HUM style hello)" "plain style"
 assert_eq "hello
 world" "$(printf 'hello\nworld\n' | NO_COLOR=1 $HUM style)" "stdin style"

@@ -25,8 +25,7 @@ void printHelp() {
 //---------------------------------------------------------------------------------------------------------------------------------//
 
     std::cout <<
-        "hum v" << HUM_VERSION << "\n"
-        "hum ... it makes your Terminal sing.\n\n"
+        "hum v" << HUM_VERSION << " ... it makes your Terminal sing.\n\n"
         "Usage: hum <command> [options]\n\n"
         "Commands:\n"
         "  style      Apply colour, borders and spacing to text\n"
