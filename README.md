@@ -1,6 +1,15 @@
-# hum
-
-> hum ... it makes your Terminal sing.
+<div align="center">
+  <img src="assets/hum-icon.svg" alt="hum terminal icon" width="192" height="192">
+  <h1>hum</h1>
+  <p><strong>hum v0.34 ... it makes your Terminal sing.</strong></p>
+  <p>
+    <a href="https://github.com/sikosis/hum"><img alt="GitHub stars" src="https://img.shields.io/github/stars/sikosis/hum?style=for-the-badge&amp;color=ff74c8"></a>
+    <img alt="Version 0.34" src="https://img.shields.io/badge/version-v0.34-79e8f2?style=for-the-badge">
+    <img alt="Platform Haiku" src="https://img.shields.io/badge/platform-Haiku-ffe46b?style=for-the-badge">
+    <img alt="C++17" src="https://img.shields.io/badge/C%2B%2B-17-79e8f2?style=for-the-badge">
+    <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/sikosis/hum?style=for-the-badge&amp;color=8de2a1"></a>
+  </p>
+</div>
 
 hum makes shell scripts friendlier with colourful text, interactive prompts,
 pickers, tables, progress indicators and other terminal building blocks made
@@ -50,17 +59,19 @@ hum --version
 
 ## Try it
 
-Make a colourful greeting:
+### Add a little colour
 
 ```sh
-hum style --foreground 212 --bold "Hello from Haiku"
+hum style --foreground '#79E8F2' --bold 'Haiku in colour'
+hum style --foreground '#FF74C8' --italic 'A little terminal melody'
+hum style --foreground '#FFE46B' --background '#262332' --bold 'Ready to go'
 ```
 
-Create a bordered card:
+### Give text a frame
 
 ```sh
-hum style --border rounded --padding "1 3" --align center --width 32 \
-    "Welcome to hum"
+hum style --border rounded --border-foreground '#FF74C8' \
+    --padding '1 3' --align center --width 34 'Hello from hum'
 ```
 
 Ask before continuing:
@@ -103,6 +114,7 @@ hum spin --title "Preparing files..." -- sleep 2
 
 ## More examples and documentation
 
+- [SSH stash transfer example](examples/stash_transfer.sh)
 - [Screenshot-ready example scripts](examples/screenshots/README.md)
 - [Complete command reference](docs/COMMANDS.md)
 - [Building, testing and implementation details](TECHNICAL.md)
