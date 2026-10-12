@@ -204,10 +204,14 @@ int runInput(const std::vector<std::string>& args) {
         return 2;
     }
 
-    if (::isatty(STDIN_FILENO) == 0) {
+    const bool standardInputIsTerminal = ::isatty(STDIN_FILENO) != 0;
+    if (!standardInputIsTerminal) {
         std::string piped{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
         while (!piped.empty() && (piped.back() == '\n' || piped.back() == '\r')) piped.pop_back();
         if (!piped.empty()) value = stripInputAnsi ? stripAnsi(piped) : piped;
+
+        std::cout << value << '\n';
+        return 0;
     }
 
     TerminalSession terminal;

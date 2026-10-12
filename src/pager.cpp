@@ -108,6 +108,11 @@ int runPager(const std::vector<std::string>& args) {
     if (content.empty() && ::isatty(STDIN_FILENO) == 0) {
         content.assign(std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>());
     }
+    if (::isatty(STDOUT_FILENO) == 0) {
+        std::cout << content;
+        if (!content.empty() && content.back() != '\n') std::cout << '\n';
+        return 0;
+    }
     TerminalSession terminal;
     if (!terminal.interactive() || !terminal.enableRawMode()) {
         std::cout << content;

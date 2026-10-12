@@ -1,0 +1,34 @@
+diff --git a/src/input.cpp b/src/input.cpp
+--- a/src/input.cpp
++++ b/src/input.cpp
+@@ -202,10 +202,14 @@ int runInput(const std::vector<std::string>& args) {
+         return 2;
+     }
+ 
+-    if (::isatty(STDIN_FILENO) == 0) {
++    const bool standardInputIsTerminal = ::isatty(STDIN_FILENO) != 0;
++    if (!standardInputIsTerminal) {
+         std::string piped{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
+         while (!piped.empty() && (piped.back() == '\n' || piped.back() == '\r')) piped.pop_back();
+         if (!piped.empty()) value = stripInputAnsi ? stripAnsi(piped) : piped;
++
++        std::cout << value << '\n';
++        return 0;
+     }
+ 
+     TerminalSession terminal;
+diff --git a/src/pager.cpp b/src/pager.cpp
+--- a/src/pager.cpp
++++ b/src/pager.cpp
+@@ -108,6 +108,11 @@ int runPager(const std::vector<std::string>& args) {
+     if (content.empty() && ::isatty(STDIN_FILENO) == 0) {
+         content.assign(std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>());
+     }
++    if (::isatty(STDOUT_FILENO) == 0) {
++        std::cout << content;
++        if (!content.empty() && content.back() != '\n') std::cout << '\n';
++        return 0;
++    }
+     TerminalSession terminal;
+     if (!terminal.interactive() || !terminal.enableRawMode()) {
+         std::cout << content;

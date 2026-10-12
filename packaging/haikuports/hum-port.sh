@@ -127,6 +127,20 @@ stage()
 		cp "$RECIPE" "$target"
 		printf 'Staged %s\n' "$target"
 	fi
+	stagePatches "$target_dir"
+}
+
+stagePatches()
+{
+	patches_dir="$RECIPE_DIR/patches"
+	[ -d "$patches_dir" ] || return 0
+	target_patches_dir="$1/patches"
+	mkdir -p "$target_patches_dir"
+	for patch_file in "$patches_dir"/*; do
+		[ -f "$patch_file" ] || continue
+		cp "$patch_file" "$target_patches_dir/"
+		printf 'Staged %s\n' "$target_patches_dir/$(basename "$patch_file")"
+	done
 }
 
 haikuTest()
@@ -137,7 +151,8 @@ haikuTest()
 		ports_path=$(awk -F= '
 			/^[[:space:]]*TREE_PATH=/ {
 				value = $2
-				gsub(/^[[:space:]\"]+|[[:space:]\"]+$/, "", value)
+				gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+				gsub(/^"|"$/, "", value)
 				print value
 				exit
 			}' "$HOME/config/settings/haikuports.conf")
@@ -168,9 +183,11 @@ haikuTest()
 	mkdir -p "$target_dir"
 	cp "$RECIPE" "$target"
 	printf 'Staged %s\n' "$target"
+	stagePatches "$target_dir"
 	printf 'Using HaikuPorter: %s\n' "$haikuporter"
 
 	cd "$ports_path"
+	"$haikuporter" --clean "$PACKAGE"
 	"$haikuporter" -S --test "$PACKAGE"
 	printf 'Build and tests completed. Packages are in %s/packages.\n' "$ports_path"
 }

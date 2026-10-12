@@ -64,8 +64,9 @@ sh packaging/haikuports/hum-port.sh stage /path/to/haikuports
 
 On Haiku, pull the latest hum commit and run one command from the hum repository
 root. It copies the finalized recipe into the HaikuPorts checkout configured by
-`TREE_PATH`, locates the existing HaikuPorter checkout, performs a strict build,
-and runs the recipe tests:
+`TREE_PATH`, stages any release patches, locates the existing HaikuPorter
+checkout, cleans the previous hum work directory, performs a strict build, and
+runs the recipe tests:
 
 ```sh
 sh packaging/haikuports/hum-port.sh haiku-test
