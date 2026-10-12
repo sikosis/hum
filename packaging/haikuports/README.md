@@ -1,57 +1,72 @@
-# HaikuPorts submission staging
+# HaikuPorts release workflow
 
-Started: 3 October 2026
+Updated: 12 October 2026
 
-This directory stages the first HaikuPorts submission for hum under the
-project's current versioning policy. The target release is hum 0.34.
+This directory contains the HaikuPorts recipe template and a helper that
+validates hum, creates a checksummed recipe from a published release, stages it
+in a HaikuPorts checkout, and runs HaikuPorter on Haiku. The current project
+version comes from the root `VERSION` file.
 
-There is deliberately no valid `.recipe` file yet. HaikuPorts recipes must
-refer to an immutable source archive, and the required `v0.34` Git tag has not
-been published. `app-misc/hum/hum-0.34.recipe.in` is a reviewable template; its
-checksum placeholder prevents accidental submission as a finished recipe.
+The helper deliberately will not create or push a hum release tag, change
+HaikuPorts branches, push commits, or create a pull request. Those actions
+remain under your control. HaikuPorts expects a reviewable recipe in its own
+feature branch, and its recipe guidelines require the source checksum and
+consistent recipe metadata.
 
-## Release prerequisite
+## 1. Validate hum
 
-Before finalising the recipe:
-
-1. Commit the intended hum 0.34 source, including the root `VERSION` file.
-2. Run `make clean && make test` on the release commit.
-3. With explicit release approval, create and push the immutable `v0.34` tag.
-4. Download the GitHub tag archive and calculate its SHA-256 checksum.
-5. Copy the template to `hum-0.34.recipe` and replace `@CHECKSUM_SHA256@`.
-
-Do not retag or replace `v0.34` after publishing it. Any correction must use a
-new hum version.
-
-## Finalise after the tag exists
-
-Run these commands from the hum repository root:
+From the hum repository root, run:
 
 ```sh
-curl -L -o /tmp/hum-0.34.tar.gz \
-    https://github.com/sikosis/hum/archive/refs/tags/v0.34.tar.gz
-sha256sum /tmp/hum-0.34.tar.gz
-cp packaging/haikuports/app-misc/hum/hum-0.34.recipe.in \
-    packaging/haikuports/app-misc/hum/hum-0.34.recipe
+sh packaging/haikuports/hum-port.sh check
 ```
 
-Replace `@CHECKSUM_SHA256@` in the new `.recipe` with the printed digest, then
-copy that recipe into `app-misc/hum/` in a current HaikuPorts checkout.
+This runs both the Make and CMake builds and test suites. Fix any failures
+before preparing a release.
 
-## Haiku validation
+## 2. Publish an immutable source tag
 
-From the HaikuPorts checkout, run:
+Commit the exact source and packaging changes you intend to release, with the
+root `VERSION` set to the intended release number. Review the diff and run the
+validation command above. After you explicitly decide to release, create and
+push the version tag yourself. For the current version, the tag name is
+`v0.4`.
+
+Do not move or replace a published tag. HaikuPorts verifies the downloaded
+archive against a checksum, so corrections require a new hum version.
+
+## 3. Generate the final recipe
+
+After the `v$VERSION` tag is visible on GitHub, run:
 
 ```sh
-haikuporter --lint hum-0.34
-haikuporter -S hum-0.34
-haikuporter -S --test hum-0.34
+sh packaging/haikuports/hum-port.sh finalize
 ```
 
-The recipe initially marks `x86_64` as untested. Remove the leading `?` only
-after the complete package build and test workflow succeeds on Haiku x86_64.
+The helper downloads the GitHub tag archive, calculates its SHA-256 checksum,
+and creates `app-misc/hum/hum-$VERSION.recipe` from the `.recipe.in` template.
+It refuses to overwrite an existing finalized recipe. Review the generated
+recipe and keep the `.recipe.in` template out of the HaikuPorts submission.
 
-Install the generated package and confirm:
+## 4. Stage and validate on Haiku
+
+Copy the generated recipe into your HaikuPorts checkout:
+
+```sh
+sh packaging/haikuports/hum-port.sh stage /path/to/haikuports
+```
+
+On Haiku, run the lint, build, and recipe tests:
+
+```sh
+sh /path/to/hum/packaging/haikuports/hum-port.sh haiku-test /path/to/haikuports
+```
+
+The recipe currently marks `x86_64` as untested. For the initial local build,
+HaikuPorter may require `ALLOW_UNTESTED="yes"` in your local HaikuPorter
+configuration. Keep the `?` marker in the submitted recipe unless the port has
+successfully built and passed its recipe tests on that architecture. After the
+package is built, install it and check:
 
 ```sh
 hum --version
@@ -59,15 +74,17 @@ hum --help
 hum style --foreground 212 'hello from HaikuDepot'
 ```
 
-The version commands must report hum 0.34 before submission.
+## 5. Prepare the HaikuPorts contribution
 
-## Submission
-
-Follow the HaikuPorts feature-branch workflow and open a pull request against
-`haikuports/haikuports:master`. Suggested title:
+Follow the HaikuPorts feature-branch workflow: update your HaikuPorts `master`
+from upstream, create a feature branch in your fork, commit only the recipe,
+and open a pull request against `haikuports/haikuports:master`. Suggested title:
 
 ```text
-app-misc/hum: add version 0.34
+app-misc/hum: add version 0.4
 ```
 
-Do not submit the `.recipe.in` template.
+The helper does not push or open the pull request. See the current
+[HaikuPorter guidelines](https://github.com/haikuports/haikuports/wiki/HaikuPorter-Guidelines)
+and [HaikuPorts development model](https://github.com/haikuports/haikuports/wiki/DevelopmentModel)
+for contribution requirements.
