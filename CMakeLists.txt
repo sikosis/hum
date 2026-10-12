@@ -21,6 +21,7 @@ add_executable(hum
     src/file.cpp
     src/table.cpp
     src/write.cpp
+    src/format.cpp
     src/viewport.cpp
     src/terminal.cpp
     src/text.cpp

@@ -1,6 +1,7 @@
 #include "hum/choose.hpp"
 #include "hum/confirm.hpp"
 #include "hum/file.hpp"
+#include "hum/format.hpp"
 #include "hum/filter.hpp"
 #include "hum/input.hpp"
 #include "hum/join.hpp"
@@ -40,6 +41,8 @@ void printHelp() {
         "  file       Browse and select files or directories\n"
         "  table      Render and select delimited table rows\n"
         "  write      Edit multi-line text\n"
+        "  format     Render Markdown, code, templates and emoji\n"
+        "  version-check Check hum version against a constraint\n"
         "  help       Show this help\n"
         "  version    Print the hum version\n\n"
         "Run 'hum <command> --help' for command-specific help.\n";
@@ -71,6 +74,8 @@ int main(int argc, char** argv) {
     if (command == "file") return hum::runFile(args);
     if (command == "table") return hum::runTable(args);
     if (command == "write") return hum::runWrite(args);
+    if (command == "format") return hum::runFormat(args);
+    if (command == "version-check") return hum::runVersionCheck(args);
     if (command == "help" || command == "--help" || command == "-h") {
         printHelp();
         return 0;

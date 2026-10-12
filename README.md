@@ -1,10 +1,10 @@
 <div align="center">
   <img src="assets/hum-icon.svg" alt="hum terminal icon" width="192" height="192">
   <h1>hum</h1>
-  <p><strong>hum v0.34 ... it makes your Terminal sing.</strong></p>
+  <p><strong>hum v0.4 ... it makes your Terminal sing.</strong></p>
   <p>
     <a href="https://github.com/sikosis/hum"><img alt="GitHub stars" src="https://img.shields.io/github/stars/sikosis/hum?style=for-the-badge&amp;color=ff74c8"></a>
-    <img alt="Version 0.34" src="https://img.shields.io/badge/version-v0.34-79e8f2?style=for-the-badge">
+    <img alt="Version 0.4" src="https://img.shields.io/badge/version-v0.4-79e8f2?style=for-the-badge">
     <img alt="Platform Haiku" src="https://img.shields.io/badge/platform-Haiku-ffe46b?style=for-the-badge">
     <img alt="C++17" src="https://img.shields.io/badge/C%2B%2B-17-79e8f2?style=for-the-badge">
     <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/sikosis/hum?style=for-the-badge&amp;color=8de2a1"></a>
@@ -35,6 +35,8 @@ into a complete interactive script.
 | `write` | Enter and edit multiple lines of text |
 | `join` | Arrange text blocks beside or above each other |
 | `log` | Print readable or structured log messages |
+| `format` | Render basic Markdown, code, templates and named emoji |
+| `version-check` | Check whether the installed hum version meets a constraint |
 
 Run `hum help` to see the full list, or `hum <command> --help` for help with a
 particular command.
@@ -100,6 +102,15 @@ Show a command running:
 
 ```sh
 hum spin --title "Preparing files..." -- sleep 2
+```
+
+Format text and check the hum version in scripts:
+
+```sh
+printf '# Hello **Haiku**\n' | hum format
+printf 'Welcome, {{name}}!\n' | hum format --type template --set name=Haiku
+printf 'Ready to go :sparkles:\n' | hum format --type emoji
+hum version-check '>=0.4' && echo "hum is new enough"
 ```
 
 ## Useful tips

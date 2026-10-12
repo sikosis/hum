@@ -20,8 +20,8 @@ documentation, implementation and `HUM_` environment variable namespace.
 | `pager` | Interactively view long text | Phase 3 ✓ |
 | `table` | Render and select rows from tabular data | Phase 3 ✓ |
 | `write` | Enter multi-line text | Phase 3 ✓ |
-| `format` | Render Markdown, code, templates and emoji | Phase 4 |
-| `version-check` | Test the program version against a constraint | Phase 4 |
+| `format` | Render Markdown, code, templates and emoji | Phase 4 ✓ |
+| `version-check` | Test the program version against a constraint | Phase 4 ✓ |
 | `completion` | Generate shell completions (hidden upstream) | Phase 4 |
 | `man` | Generate manual pages (hidden upstream) | Phase 4 |
 
@@ -83,11 +83,14 @@ The implemented support boundary is:
 - `pager`: keyboard scrolling, page navigation, line numbers, soft wrapping,
   configurable dimensions and idle timeout;
 - `filter`: fuzzy or word-prefix matching, score sorting, initial queries,
-  strict/free-text output, single/multiple selection and custom delimiters;
+  strict/free-text output, single/multiple selection, custom delimiters,
+  `--preselect`, Ctrl+A select/clear for visible matches, and Ctrl+O to move
+  focus between query entry and the result list;
 - `file`: hidden entries, permissions, human-readable sizes, symlink and
   directory traversal, and separate file/directory selection policies;
 - `table`: quoted CSV/TSV parsing, explicit columns and widths, six border
-  styles, static printing, selectable rows and single-column output;
+  styles, static printing, selectable rows, single-column output and UTF-8 BOM
+  removal at the beginning of input;
 - `write`: UTF-8 insertion and deletion, multi-line navigation, line joining,
   character/line limits, line numbers, active-line highlighting, piped initial
   values and Ctrl+D submission.
@@ -98,10 +101,16 @@ Search highlighting in `pager`, the upstream default recursive file list in
 
 ## Phase 4: rich text and distribution
 
-Phase 4 will add `format` (Markdown, code, templates and named emoji), semantic
-`version-check`, shell completion generation and manual-page generation.
-Markdown rendering and syntax highlighting will be evaluated carefully to
-avoid turning large third-party dependencies into a requirement.
+Phase 4 adds `format` (basic Markdown, lightweight keyword/string/number
+highlighting, `{{name}}` templates and named emoji) and semantic
+`version-check` (`=`, `<`, `<=`, `>` and `>=` numeric version constraints).
+Shell completion generation and manual-page generation remain future work.
+Formatting stays dependency-free; its Markdown and syntax-highlighting support
+is intentionally lightweight rather than a full CommonMark or language parser.
+
+Recent compatibility additions to Phase 3 include filter `--preselect`, Ctrl+A
+to select or clear visible matches in multi-select mode, Ctrl+O to toggle query
+and list focus, and removal of a UTF-8 BOM at the start of delimited input.
 
 This phase also includes a HaikuPorter recipe and `.hpkg` packaging once the
 supported command surface is stable.

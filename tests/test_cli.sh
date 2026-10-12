@@ -17,8 +17,8 @@ assert_eq()
     [ "$expected" = "$actual" ] || fail "$description: expected '$expected', got '$actual'"
 }
 
-assert_eq "hum 0.34" "$($HUM --version)" "version output"
-assert_eq "hum v0.34 ... it makes your Terminal sing." \
+assert_eq "hum 0.4" "$($HUM --version)" "version output"
+assert_eq "hum v0.4 ... it makes your Terminal sing." \
     "$($HUM --help | sed -n '1p')" "help heading version"
 assert_eq "hello" "$(NO_COLOR=1 $HUM style hello)" "plain style"
 assert_eq "hello
@@ -86,6 +86,13 @@ two" "$(printf 'one\ntwo\n' | NO_COLOR=1 $HUM pager)" "non-interactive pager"
 assert_eq "strawberry" \
     "$(printf 'apple\nstrawberry\npear\n' | NO_COLOR=1 $HUM filter --value straw)" \
     "non-interactive unique filter"
+printf 'Name,Value\nAlpha,1\n' | NO_COLOR=1 $HUM table --print --border none > /dev/null
+assert_eq "Hello Haiku!" "$(printf 'Hello {{name}}!' | NO_COLOR=1 $HUM format --type template --set name=Haiku)" "template format"
+assert_eq "✨" "$(printf ':sparkles:' | NO_COLOR=1 $HUM format --type emoji)" "emoji format"
+assert_eq "Heading" "$(printf '# Heading\n' | NO_COLOR=1 $HUM format)" "markdown format"
+if NO_COLOR=1 $HUM version-check '>=0.4'; then :; else fail "version-check should accept current version"; fi
+if NO_COLOR=1 $HUM version-check '>0.4' 2>/dev/null; then fail "version-check should reject greater version"; fi
+if printf '\357\273\277Name,Value\nAlpha,1\n' | NO_COLOR=1 $HUM table --print --border none | grep -q 'Name'; then :; else fail "CSV BOM should be stripped"; fi
 assert_eq "first line
 second line" \
     "$(printf 'first line\nsecond line\n' | NO_COLOR=1 $HUM write)" \

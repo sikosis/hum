@@ -47,10 +47,12 @@ std::vector<std::vector<std::string>> parseDelimited(const std::string& input, c
 //---------------------------------------------------------------------------------------------------------------------------------//
 
     std::vector<std::vector<std::string>> rows;
+    std::size_t inputStart = input.size() >= 3 && static_cast<unsigned char>(input[0]) == 0xef &&
+        static_cast<unsigned char>(input[1]) == 0xbb && static_cast<unsigned char>(input[2]) == 0xbf ? 3 : 0;
     std::vector<std::string> row;
     std::string field;
     bool quoted = false;
-    for (std::size_t index = 0; index < input.size(); ++index) {
+    for (std::size_t index = inputStart; index < input.size(); ++index) {
         const char character = input[index];
         if (quoted) {
             if (character == '"') {

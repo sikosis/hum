@@ -140,6 +140,8 @@ int runFilter(const std::vector<std::string>& args) {
     bool showHelp = true;
     bool fuzzy = true;
     bool fuzzySort = true;
+    bool preselect = false;
+    bool focusOut = false;
     int height = 10;
     std::string header;
     std::string placeholder = "Filter...";
@@ -156,6 +158,8 @@ int runFilter(const std::vector<std::string>& args) {
             if (arg == "--limit") limit = std::stoi(requireValue(args, index, arg));
             else if (arg == "--no-limit") noLimit = true;
             else if (arg == "--select-if-one") selectIfOne = true;
+            else if (arg == "--preselect") preselect = true;
+            else if (arg == "--focus-out") focusOut = true;
             else if (arg == "--strict") strict = true;
             else if (arg == "--no-strict") strict = false;
             else if (arg == "--show-help") showHelp = true;
@@ -204,13 +208,17 @@ int runFilter(const std::vector<std::string>& args) {
     LiveRegion region(terminal);
     std::size_t cursor = 0;
     std::vector<bool> selected(options.size(), false);
+    if (preselect) {
+        for (const Match& match : matchesFor(options, query, fuzzy, fuzzySort)) selected[match.index] = true;
+    }
+    bool queryFocused = !focusOut;
     while (true) {
         std::vector<Match> matches = matchesFor(options, query, fuzzy, fuzzySort);
         if (cursor >= matches.size()) cursor = matches.empty() ? 0 : matches.size() - 1;
         std::vector<std::string> screen;
         if (!header.empty()) screen.push_back(header);
         const std::string inputLine = query.empty() ? placeholder : query;
-        screen.push_back(prompt + inputLine);
+        screen.push_back((queryFocused ? prompt : "  ") + inputLine + (queryFocused ? "" : "  [list focus]"));
         const std::size_t start = cursor >= static_cast<std::size_t>(height)
             ? cursor - static_cast<std::size_t>(height) + 1 : 0;
         for (std::size_t row = start; row < matches.size() && row < start + static_cast<std::size_t>(height); ++row) {
@@ -223,15 +231,23 @@ int runFilter(const std::vector<std::string>& args) {
         }
         if (matches.empty()) screen.push_back("  No matches");
         if (showHelp) screen.push_back(limit == 1 && !noLimit
-            ? "type filter • ↑/↓ navigate • enter select"
-            : "type filter • ↑/↓ navigate • tab select • enter submit");
+            ? "type filter • ↑/↓ navigate • ctrl+o focus list • enter select"
+            : "type filter • ↑/↓ navigate • tab select • ctrl+a all • ctrl+o focus list • enter submit");
         region.render(screen);
 
         const InputEvent event = terminal.readEvent();
-        if (!event.text.empty() && event.text != " ") {
+        if (event.text == std::string(1, '\x0f')) {
+            queryFocused = !queryFocused;
+        } else if (event.text == std::string(1, '\x01') && (limit != 1 || noLimit)) {
+            const bool allSelected = std::all_of(matches.begin(), matches.end(), [&](const Match& match) { return selected[match.index]; });
+            for (const Match& match : matches) {
+                if (allSelected) selected[match.index] = false;
+                else if (noLimit || static_cast<int>(std::count(selected.begin(), selected.end(), true)) < limit) selected[match.index] = true;
+            }
+        } else if (!event.text.empty() && event.text != " " && queryFocused) {
             query += event.text;
             cursor = 0;
-        } else if (event.key == Key::Backspace) {
+        } else if (event.key == Key::Backspace && queryFocused) {
             eraseLastCharacter(query);
             cursor = 0;
         } else if (event.key == Key::Up) {
@@ -275,6 +291,8 @@ void printFilterHelp() {
         "Options:\n"
         "  --limit N, --no-limit       Selection limit\n"
         "  --select-if-one             Return a sole match immediately\n"
+        "  --preselect                 Select items matching the initial query\n"
+        "  --focus-out                 Start with list focus (Ctrl+O toggles focus)\n"
         "  --[no-]strict               Require a matched item\n"
         "  --[no-]fuzzy                Toggle subsequence matching\n"
         "  --[no-]fuzzy-sort           Toggle score ordering\n"

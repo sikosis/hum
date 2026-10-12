@@ -8,7 +8,7 @@ SOURCES := src/main.cpp src/style.cpp src/confirm.cpp src/join.cpp src/log.cpp \
 	src/input.cpp src/choose.cpp src/spin.cpp src/terminal.cpp src/text.cpp
 
 SOURCES += src/pager.cpp src/filter.cpp src/file.cpp src/table.cpp src/write.cpp \
-	src/viewport.cpp
+	src/viewport.cpp src/format.cpp
 OBJECTS := $(SOURCES:.cpp=.o)
 TARGET := hum
 TEST_TARGET := tests/terminal_test
