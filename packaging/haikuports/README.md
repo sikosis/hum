@@ -68,11 +68,7 @@ On Haiku, run the lint, build, and recipe tests:
 sh /path/to/hum/packaging/haikuports/hum-port.sh haiku-test /path/to/haikuports
 ```
 
-The recipe currently marks `x86_64` as untested. For the initial local build,
-HaikuPorter may require `ALLOW_UNTESTED="yes"` in your local HaikuPorter
-configuration. Keep the `?` marker in the submitted recipe unless the port has
-successfully built and passed its recipe tests on that architecture. After the
-package is built, install it and check:
+The recipe supports `x86_64`. After the package is built, install it and check:
 
 ```sh
 hum --version
