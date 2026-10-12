@@ -28,7 +28,7 @@ Commands:
   check                 Run Make and CMake builds and their test suites
   finalize              Fetch the published $RELEASE_TAG archive and generate its recipe checksum
   stage HAIKUPORTS_PATH  Copy the finalized recipe into a HaikuPorts checkout
-  haiku-test PATH       Lint and build/test the staged recipe on Haiku
+  haiku-test [PATH]     Stage, strictly build, and test the recipe on Haiku
 
 This script never creates or pushes a release tag, changes a HaikuPorts branch,
 or submits a pull request.
@@ -131,13 +131,48 @@ stage()
 
 haikuTest()
 {
-	[ "$#" -eq 1 ] || fail "haiku-test requires the path to a HaikuPorts checkout"
-	ports_path=$1
-	[ -f "$ports_path/app-misc/hum/hum-$VERSION.recipe" ] || fail "hum-$VERSION.recipe is not staged in that checkout"
-	command -v haikuporter >/dev/null 2>&1 || fail "haikuporter is only available in your Haiku build environment"
+	[ "$#" -le 1 ] || fail "haiku-test accepts at most one HaikuPorts checkout path"
+	ports_path=${1:-}
+	if [ -z "$ports_path" ] && [ -f "$HOME/config/settings/haikuports.conf" ]; then
+		ports_path=$(awk -F= '
+			/^[[:space:]]*TREE_PATH=/ {
+				value = $2
+				gsub(/^[[:space:]\"]+|[[:space:]\"]+$/, "", value)
+				print value
+				exit
+			}' "$HOME/config/settings/haikuports.conf")
+	fi
+	ports_path=${ports_path:-"$HOME/haikuports"}
+	[ -d "$ports_path" ] || fail "HaikuPorts checkout not found: $ports_path"
+
+	haikuporter=${HAIKUPORTER:-}
+	if [ -z "$haikuporter" ] && command -v haikuporter >/dev/null 2>&1; then
+		haikuporter=$(command -v haikuporter)
+	fi
+	if [ -z "$haikuporter" ]; then
+		for candidate in "$HOME/haikuporter/haikuporter" \
+			"$(dirname "$ports_path")/haikuporter/haikuporter" \
+			/boot/home/haikuporter/haikuporter; do
+			if [ -x "$candidate" ]; then
+				haikuporter=$candidate
+				break
+			fi
+		done
+	fi
+	[ -n "$haikuporter" ] && [ -x "$haikuporter" ] \
+		|| fail "HaikuPorter not found; set HAIKUPORTER to its executable"
+
+	[ -f "$RECIPE" ] || fail "missing finalized recipe: $RECIPE"
+	target_dir="$ports_path/app-misc/hum"
+	target="$target_dir/hum-$VERSION.recipe"
+	mkdir -p "$target_dir"
+	cp "$RECIPE" "$target"
+	printf 'Staged %s\n' "$target"
+	printf 'Using HaikuPorter: %s\n' "$haikuporter"
+
 	cd "$ports_path"
-	haikuporter --lint "$PACKAGE"
-	haikuporter -S --test "$PACKAGE"
+	"$haikuporter" -S --test "$PACKAGE"
+	printf 'Build and tests completed. Packages are in %s/packages.\n' "$ports_path"
 }
 
 validateVersion

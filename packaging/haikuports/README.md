@@ -62,11 +62,17 @@ Copy the generated recipe into your HaikuPorts checkout:
 sh packaging/haikuports/hum-port.sh stage /path/to/haikuports
 ```
 
-On Haiku, run the lint, build, and recipe tests:
+On Haiku, pull the latest hum commit and run one command from the hum repository
+root. It copies the finalized recipe into the HaikuPorts checkout configured by
+`TREE_PATH`, locates the existing HaikuPorter checkout, performs a strict build,
+and runs the recipe tests:
 
 ```sh
-sh /path/to/hum/packaging/haikuports/hum-port.sh haiku-test /path/to/haikuports
+sh packaging/haikuports/hum-port.sh haiku-test
 ```
+
+You may pass a different HaikuPorts checkout path as the final argument, or set
+`HAIKUPORTER` if its executable is in a non-standard location.
 
 The recipe supports `x86_64`. After the package is built, install it and check:
 
