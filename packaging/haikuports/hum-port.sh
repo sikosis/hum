@@ -4,11 +4,14 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd "$SCRIPT_DIR/../.." && pwd)
 VERSION=$(sed -n '1p' "$REPO_ROOT/VERSION")
+RELEASE_TAG=$(sed -n '1p' "$SCRIPT_DIR/UPSTREAM_TAG")
+RELEASE_VERSION=${RELEASE_TAG#v}
+ARCHIVE_ROOT="hum-$RELEASE_VERSION"
 RECIPE_DIR="$SCRIPT_DIR/app-misc/hum"
 TEMPLATE="$RECIPE_DIR/hum-$VERSION.recipe.in"
 RECIPE="$RECIPE_DIR/hum-$VERSION.recipe"
 PACKAGE="hum-$VERSION"
-SOURCE_URL="https://github.com/sikosis/hum/archive/refs/tags/v$VERSION.tar.gz"
+SOURCE_URL="https://github.com/sikosis/hum/archive/refs/tags/$RELEASE_TAG.tar.gz"
 
 fail()
 {
@@ -23,7 +26,7 @@ Usage: sh packaging/haikuports/hum-port.sh <command> [arguments]
 
 Commands:
   check                 Run Make and CMake builds and their test suites
-  finalize              Fetch the published v$VERSION archive and generate its recipe checksum
+  finalize              Fetch the published $RELEASE_TAG archive and generate its recipe checksum
   stage HAIKUPORTS_PATH  Copy the finalized recipe into a HaikuPorts checkout
   haiku-test PATH       Lint and build/test the staged recipe on Haiku
 
@@ -36,6 +39,14 @@ validateVersion()
 {
 	case "$VERSION" in
 		''|*[!0-9.]*|.*|*.|*..*) fail "VERSION must be a dotted numeric version; found '$VERSION'" ;;
+	esac
+	case "$RELEASE_TAG" in
+		v[0-9]*.[0-9]*|v[0-9]*.[0-9]*.[0-9]*) ;;
+		*) fail "UPSTREAM_TAG must be a numeric version tag such as v0.4.0" ;;
+	esac
+	case "$RELEASE_VERSION" in
+		"$VERSION"|"$VERSION.0") ;;
+		*) fail "upstream tag $RELEASE_TAG does not match project VERSION $VERSION" ;;
 	esac
 }
 
@@ -62,15 +73,18 @@ finalize()
 	command -v git >/dev/null 2>&1 || fail "git is required to confirm the release tag"
 	command -v curl >/dev/null 2>&1 || fail "curl is required to fetch the release archive"
 	command -v tar >/dev/null 2>&1 || fail "tar is required to inspect the release archive"
-	git ls-remote --exit-code https://github.com/sikosis/hum.git "refs/tags/v$VERSION" >/dev/null \
-		|| fail "remote tag v$VERSION is not published yet; publish the release before finalizing"
+	git ls-remote --exit-code https://github.com/sikosis/hum.git "refs/tags/$RELEASE_TAG" >/dev/null \
+		|| fail "remote tag $RELEASE_TAG is not published yet; publish the release before finalizing"
 
 	work_dir=$(mktemp -d "${TMPDIR:-/tmp}/hum-port-finalize.XXXXXX") || fail "could not create temporary directory"
 	trap 'rm -rf "$work_dir"' EXIT HUP INT TERM
-	archive="$work_dir/hum-$VERSION.tar.gz"
+	archive="$work_dir/hum-$RELEASE_VERSION.tar.gz"
 	curl --fail --location --silent --show-error "$SOURCE_URL" --output "$archive"
-	archive_version=$(tar -xOf "$archive" "hum-$VERSION/VERSION" | sed -n '1p')
-	[ "$archive_version" = "$VERSION" ] || fail "tag archive VERSION is '$archive_version', expected '$VERSION'"
+	archive_version=$(tar -xOf "$archive" "$ARCHIVE_ROOT/VERSION" | sed -n '1p')
+	case "$archive_version" in
+		"$VERSION"|"$VERSION.0") ;;
+		*) fail "tag archive VERSION is '$archive_version', expected '$VERSION' or '$VERSION.0'" ;;
+	esac
 	if command -v sha256sum >/dev/null 2>&1; then
 		checksum=$(sha256sum "$archive" | awk '{print $1}')
 	elif command -v shasum >/dev/null 2>&1; then
@@ -82,13 +96,17 @@ finalize()
 		????????????????????????????????????????????????????????????????) ;;
 		*) fail "could not calculate a SHA-256 checksum" ;;
 	esac
-	sed "s/@CHECKSUM_SHA256@/$checksum/" "$TEMPLATE" > "$RECIPE"
-	if grep -q '@CHECKSUM_SHA256@' "$RECIPE"; then
+	sed \
+		-e "s|@SOURCE_URI@|$SOURCE_URL|" \
+		-e "s|@SOURCE_FILENAME@|hum-$RELEASE_VERSION.tar.gz|" \
+		-e "s|@SOURCE_DIR@|$ARCHIVE_ROOT|" \
+		-e "s/@CHECKSUM_SHA256@/$checksum/" "$TEMPLATE" > "$RECIPE"
+	if grep -Eq '@(SOURCE_URI|SOURCE_FILENAME|SOURCE_DIR|CHECKSUM_SHA256)@' "$RECIPE"; then
 		rm -f "$RECIPE"
 		fail "recipe still contains an unfilled checksum placeholder"
 	fi
 	printf 'Created %s\nSHA-256: %s\n' "$RECIPE" "$checksum"
-	printf 'The release tag must remain immutable; do not move or replace v%s.\n' "$VERSION"
+	printf 'The release tag must remain immutable; do not move or replace %s.\n' "$RELEASE_TAG"
 	rm -rf "$work_dir"
 	trap - EXIT HUP INT TERM
 }
