@@ -25,6 +25,9 @@ bool readByte(int fd, unsigned char& value, int timeoutMilliseconds) {
 TerminalSession::TerminalSession() {
 //---------------------------------------------------------------------------------------------------------------------------------//
 
+    if (std::getenv("HUM_NONINTERACTIVE") != nullptr) {
+        return;
+    }
     fd_ = ::open("/dev/tty", O_RDWR);
     if (fd_ >= 0) {
         ownsFd_ = true;

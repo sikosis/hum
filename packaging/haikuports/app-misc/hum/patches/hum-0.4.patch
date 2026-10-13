@@ -32,3 +32,27 @@ diff --git a/src/pager.cpp b/src/pager.cpp
      TerminalSession terminal;
      if (!terminal.interactive() || !terminal.enableRawMode()) {
          std::cout << content;
+diff --git a/src/terminal.cpp b/src/terminal.cpp
+--- a/src/terminal.cpp
++++ b/src/terminal.cpp
+@@ -25,4 +25,7 @@
+ TerminalSession::TerminalSession() {
+ //---------------------------------------------------------------------------------------------------------------------------------//
+-
++
++    if (std::getenv("HUM_NONINTERACTIVE") != nullptr) {
++        return;
++    }
+     fd_ = ::open("/dev/tty", O_RDWR);
+diff --git a/tests/test_cli.sh b/tests/test_cli.sh
+--- a/tests/test_cli.sh
++++ b/tests/test_cli.sh
+@@ -1,4 +1,7 @@
+ #!/bin/sh
+ set -eu
+-
++
++HUM_NONINTERACTIVE=1
++export HUM_NONINTERACTIVE
++
+ HUM=${1:-./hum}

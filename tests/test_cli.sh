@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+HUM_NONINTERACTIVE=1
+export HUM_NONINTERACTIVE
+
 HUM=${1:-./hum}
 
 fail()
