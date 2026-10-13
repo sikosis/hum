@@ -1,19 +1,20 @@
 # HaikuPorts release workflow
 
-Updated: 12 October 2026
+Updated: 13 October 2026
 
 This directory contains the HaikuPorts recipe template and a helper that
 validates hum, creates a checksummed recipe from a published release, stages it
-in a HaikuPorts checkout, and runs HaikuPorter on Haiku. The current project
-version comes from the root `VERSION` file.
+in a HaikuPorts checkout, runs HaikuPorter on Haiku, and can submit the finished
+port from an isolated checkout. The current project version comes from the root
+`VERSION` file.
 The GitHub source tag is kept separately in `UPSTREAM_TAG` because the current
 project version is `0.4`, while the published tag is `v0.4.0`.
 
-The helper deliberately will not create or push a hum release tag, change
-HaikuPorts branches, push commits, or create a pull request. Those actions
-remain under your control. HaikuPorts expects a reviewable recipe in its own
-feature branch, and its recipe guidelines require the source checksum and
-consistent recipe metadata.
+The helper never creates, moves, or replaces a hum release tag. Its `submit`
+command performs the HaikuPorts build, branch, commit, push, and pull request
+steps only when you explicitly run it. HaikuPorts expects a reviewable recipe
+in its own feature branch, and its recipe guidelines require the source
+checksum and consistent recipe metadata.
 
 ## 1. Validate hum
 
@@ -83,17 +84,26 @@ hum --help
 hum style --foreground 212 'hello from HaikuDepot'
 ```
 
-## 5. Prepare the HaikuPorts contribution
+## 5. Submit the HaikuPorts contribution
 
-Follow the HaikuPorts feature-branch workflow: update your HaikuPorts `master`
-from upstream, create a feature branch in your fork, commit only the recipe,
-and open a pull request against `haikuports/haikuports:master`. Suggested title:
+On Haiku, run the submission command from the hum repository:
 
-```text
-app-misc/hum: add version 0.4
+```sh
+sh packaging/haikuports/hum-port.sh submit
 ```
 
-The helper does not push or open the pull request. See the current
+The command prompts for a GitHub token if `GITHUB_TOKEN` is not already set. It
+clones a clean HaikuPorts tree into a temporary directory, stages only the hum
+recipe and release patches, runs the strict build and tests, creates the hum
+feature branch, pushes it to your fork, and opens the pull request. If the same
+branch was already pushed, the command verifies that its file list and hum
+contents match before using it. Other projects or untracked files in an
+existing HaikuPorts checkout cannot enter the submission.
+
+Set `HUM_GITHUB_REPOSITORY`, `HUM_GIT_NAME`, `HUM_GIT_EMAIL`, or
+`HAIKUPORTER` only when their defaults do not match your environment.
+
+See the current
 [HaikuPorter guidelines](https://github.com/haikuports/haikuports/wiki/HaikuPorter-Guidelines)
 and [HaikuPorts development model](https://github.com/haikuports/haikuports/wiki/DevelopmentModel)
 for contribution requirements.
